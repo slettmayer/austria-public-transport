@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+
+- Add brand icon (`brand/` folder) so the integration shows its icon in the HA UI via the Brands Proxy API (HA 2026.3+)
+
 ## 1.0.0
 
 - Relaunched as **Austria Public Transport (Wiener Linien & ÖBB)** in a standalone (non-fork) repository
