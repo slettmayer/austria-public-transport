@@ -1,0 +1,133 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Austria Public Transport",
+        "description": "Set up Wiener Linien departure monitoring. ÖBB train data is available on demand via services.",
+        "data": {
+          "name": "Name",
+          "stops": "Stop IDs (comma-separated)"
+        }
+      }
+    },
+    "error": {
+      "no_stops": "Please enter at least one stop ID.",
+      "invalid_stop_id": "Stop IDs must be numeric."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Austria Public Transport Options",
+        "data": {
+          "stops": "Stop IDs (comma-separated)",
+          "max_departures": "Max departures per stop"
+        }
+      }
+    },
+    "error": {
+      "no_stops": "Please enter at least one stop ID.",
+      "invalid_stop_id": "Stop IDs must be numeric."
+    }
+  },
+  "services": {
+    "fetch_departures": {
+      "name": "Fetch Departures",
+      "description": "Call Wiener Linien API to get next departures for a stop ID.",
+      "fields": {
+        "stop_id": {
+          "name": "Stop ID",
+          "description": "Numeric stop ID."
+        }
+      }
+    },
+    "oebb_search_station": {
+      "name": "OeBB: Search Station",
+      "description": "Search OeBB stations by name to find station IDs.",
+      "fields": {
+        "query": {
+          "name": "Search Query",
+          "description": "Station name or partial name to search for."
+        },
+        "max_results": {
+          "name": "Max Results",
+          "description": "Maximum number of stations to return."
+        }
+      }
+    },
+    "oebb_station_board": {
+      "name": "OeBB: Station Board",
+      "description": "Fetch departures or arrivals at an OeBB station.",
+      "fields": {
+        "station_id": {
+          "name": "Station ID",
+          "description": "OeBB station ID (extId). Use oebb_search_station to find this."
+        },
+        "station_name": {
+          "name": "Station Name",
+          "description": "Station name for automatic lookup. Used if Station ID is not provided."
+        },
+        "board_type": {
+          "name": "Board Type",
+          "description": "DEP for departures, ARR for arrivals."
+        },
+        "max_journeys": {
+          "name": "Max Journeys",
+          "description": "Maximum number of departures or arrivals to return."
+        }
+      }
+    },
+    "oebb_trip_search": {
+      "name": "OeBB: Trip Search",
+      "description": "Search for train connections between two OeBB stations.",
+      "fields": {
+        "from_station_id": {
+          "name": "From Station ID",
+          "description": "Departure station ID."
+        },
+        "from_station_name": {
+          "name": "From Station Name",
+          "description": "Departure station name for automatic lookup."
+        },
+        "to_station_id": {
+          "name": "To Station ID",
+          "description": "Arrival station ID."
+        },
+        "to_station_name": {
+          "name": "To Station Name",
+          "description": "Arrival station name for automatic lookup."
+        },
+        "max_connections": {
+          "name": "Max Connections",
+          "description": "Maximum number of connections to return."
+        },
+        "time": {
+          "name": "Time",
+          "description": "Departure or arrival time. If not set, the current time is used."
+        },
+        "time_mode": {
+          "name": "Time Mode",
+          "description": "Whether the specified time is a departure or arrival time."
+        },
+        "direct_only": {
+          "name": "Direct Only",
+          "description": "Only show direct connections without changes."
+        }
+      }
+    },
+    "oebb_service_alerts": {
+      "name": "OeBB: Service Alerts",
+      "description": "Fetch current OeBB service alerts and disruptions.",
+      "fields": {
+        "max_alerts": {
+          "name": "Max Alerts",
+          "description": "Maximum number of alerts to return."
+        },
+        "product_filter": {
+          "name": "Product Filter",
+          "description": "Bitmask to filter by transport type (1=ICE/RJX, 2=IC/EC, 4=NJ, 8=D/EN, 16=REX/R, 32=S-Bahn, 64=Bus, 128=Ferry, 256=U-Bahn, 512=Tram, 1023=all)."
+        }
+      }
+    }
+  }
+}

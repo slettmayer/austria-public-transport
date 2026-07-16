@@ -1,0 +1,129 @@
+fetch_departures:
+  fields:
+    stop_id:
+      required: true
+      example: "4609"
+      default: ""
+      selector:
+        text:
+          multiple: false
+
+oebb_search_station:
+  fields:
+    query:
+      required: true
+      example: "Wien Hauptbahnhof"
+      selector:
+        text:
+          multiple: false
+    max_results:
+      required: false
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 50
+          mode: box
+
+oebb_station_board:
+  fields:
+    station_id:
+      required: false
+      example: "1190100"
+      selector:
+        text:
+          multiple: false
+    station_name:
+      required: false
+      example: "Wien Hbf"
+      selector:
+        text:
+          multiple: false
+    board_type:
+      required: false
+      default: "DEP"
+      selector:
+        select:
+          options:
+            - "DEP"
+            - "ARR"
+    max_journeys:
+      required: false
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 50
+          mode: box
+
+oebb_trip_search:
+  fields:
+    from_station_id:
+      required: false
+      example: "1190100"
+      selector:
+        text:
+          multiple: false
+    from_station_name:
+      required: false
+      example: "Wien Hbf"
+      selector:
+        text:
+          multiple: false
+    to_station_id:
+      required: false
+      example: "8100002"
+      selector:
+        text:
+          multiple: false
+    to_station_name:
+      required: false
+      example: "Salzburg Hbf"
+      selector:
+        text:
+          multiple: false
+    max_connections:
+      required: false
+      default: 5
+      selector:
+        number:
+          min: 1
+          max: 10
+          mode: box
+    time:
+      required: false
+      example: "2026-04-15 08:00:00"
+      selector:
+        datetime:
+    time_mode:
+      required: false
+      default: "departure"
+      selector:
+        select:
+          options:
+            - "departure"
+            - "arrival"
+    direct_only:
+      required: false
+      default: false
+      selector:
+        boolean:
+
+oebb_service_alerts:
+  fields:
+    max_alerts:
+      required: false
+      default: 20
+      selector:
+        number:
+          min: 1
+          max: 100
+          mode: box
+    product_filter:
+      required: false
+      default: 1023
+      selector:
+        number:
+          min: 1
+          max: 1023
+          mode: box
