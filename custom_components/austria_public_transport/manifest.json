@@ -1,11 +1,14 @@
 {
   "domain": "austria_public_transport",
   "name": "Austria Public Transport",
-  "codeowners": ["@0Paul89", "@slettmayer"],
+  "codeowners": [
+    "@0Paul89",
+    "@slettmayer"
+  ],
   "config_flow": true,
   "documentation": "https://github.com/slettmayer/austria-public-transport",
   "integration_type": "service",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/slettmayer/austria-public-transport/issues",
-  "version": "1.0.1"
+  "version": "1.0.2"
 }
