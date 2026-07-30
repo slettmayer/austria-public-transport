@@ -1,0 +1,9 @@
+# Pinned exactly so Dependabot, not pip's resolver, decides when ruff moves.
+#
+# The pin must be `==`. A `>=` floor lets pip resolve whatever is newest, which
+# is how CI ran ruff 0.16.0 -- a release that expanded the default rule set from
+# 59 rules to 413 -- for a week before anyone chose it.
+#
+# The Tests job still installs its dependencies inline and unpinned; that is a
+# larger gap and is deliberately not addressed here.
+ruff==0.16.0
