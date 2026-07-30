@@ -2,6 +2,7 @@
 > Home Assistant custom integration for real-time Vienna public transport departures via the Wiener Linien OGD Realtime API and OeBB (Austrian Federal Railways) train data via the OeBB Scotty API.
 
 ## Quick Reference
+- **Install lint tooling**: `pip install -r requirements_lint.txt` (pins ruff, so local and CI agree)
 - **Lint**: `ruff check .`
 - **Format**: `ruff format .`
 - **Test (unit)**: `pytest tests/ -v -m "not integration"`
@@ -46,7 +47,8 @@ Vienna public transport departure monitoring and Austrian train connections. Eac
 
 ## Structural Risks
 - Test coverage exists for `api.py` and `oebb_api.py` -- coordinator, sensor, config flow are untested
-- Version in `pyproject.toml` out of sync with `manifest.json` (CI uses manifest only)
+- The `Tests` CI job installs `pytest pytest-asyncio aiohttp voluptuous homeassistant` inline and **unpinned**, so a Home Assistant release can change the verdict with no commit of ours. Only `ruff` is pinned (`requirements_lint.txt`)
+- `pyproject.toml` is tool configuration only; its `version` is inert and intentionally not synced with `manifest.json`, which is the one CI and `release.yml` read
 - Sentinel dict error pattern is fragile -- callers must check `if "message" in result`
 - YAML and config entry setup paths duplicate coordinator creation logic
 - `trafficInfoList` endpoint constant defined but unused
