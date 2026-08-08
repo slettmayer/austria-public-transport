@@ -1,5 +1,7 @@
 {
   "name": "Austria Public Transport (Wiener Linien & ÖBB)",
   "render_readme": true,
-  "country": "AT"
+  "country": "AT",
+  "zip_release": true,
+  "filename": "austria_public_transport.zip"
 }

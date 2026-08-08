@@ -50,13 +50,37 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
 
+      - name: Build the HACS archive
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          # HACS extracts this archive straight into
+          # `custom_components/austria_public_transport/`
+          # (`zip_file.extractall(self.content.path.local)`), so the integration's
+          # files must sit at the archive ROOT -- a top-level
+          # `austria_public_transport/` directory inside the zip would land as
+          # `custom_components/austria_public_transport/austria_public_transport/`.
+          # Hence the `cd` and the `.` rather than zipping the path from here.
+          #
+          # The name must match `filename` in hacs.json exactly: HACS asks the
+          # release for that one asset by name and fails the download if it is
+          # absent. The HACS validation action only checks that `filename` is set,
+          # never that the asset exists, so a broken step here fails silently at
+          # install time and never in CI.
+          cd custom_components/austria_public_transport
+          zip -r -q "${GITHUB_WORKSPACE}/austria_public_transport.zip" . \
+            -x '*__pycache__*' '*.pyc'
+          unzip -l "${GITHUB_WORKSPACE}/austria_public_transport.zip"
+
       - name: Create release
         if: steps.check.outputs.exists == 'false'
         run: |
+          # The archive is a positional argument to the same call, so a release is
+          # never published without it.
           gh release create "${TAG}" \
             --title "${TAG}" \
             --target "${{ github.event.workflow_run.head_sha }}" \
-            --notes-file /tmp/release-notes.md
+            --notes-file /tmp/release-notes.md \
+            austria_public_transport.zip
         env:
           TAG: ${{ steps.version.outputs.tag }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
