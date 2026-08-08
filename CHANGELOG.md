@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5
+
+- HACS now installs from a single `austria_public_transport.zip` release asset instead of fetching every file individually through the GitHub API -- faster, and it makes installs countable, since GitHub reports a download count per release asset
+- No change to the integration itself: same entities, services and configuration, nothing to do after updating
+- Older releases keep working: their tagged `hacs.json` has no `zip_release`, so HACS falls back to the file-by-file download for them
+
 ## 1.0.4
 
 - Bump dependency (Dependabot)

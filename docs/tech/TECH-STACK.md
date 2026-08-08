@@ -39,7 +39,7 @@ Documents the languages, frameworks, build tools, testing infrastructure, and ex
 ### CI/CD
 - GitHub Actions with three workflows:
   - `validate.yml` -- runs on push to `main` and PRs: Ruff lint+format, Hassfest, HACS validation, pytest. A `gate` job aggregates results.
-  - `release.yml` -- triggered after validate succeeds on `main`: reads version from `manifest.json`, extracts `CHANGELOG.md` section, creates GitHub Release.
+  - `release.yml` -- triggered after validate succeeds on `main`: reads version from `manifest.json`, extracts `CHANGELOG.md` section, builds `austria_public_transport.zip`, creates the GitHub Release with that archive attached.
   - `dependabot-version-bump.yml` -- auto-bumps patch version in `manifest.json` and prepends `CHANGELOG.md` entry for Dependabot PRs.
 - Dependabot configured for weekly GitHub Actions dependency updates.
 
@@ -51,6 +51,30 @@ Documents the languages, frameworks, build tools, testing infrastructure, and ex
 ### Distribution
 - HACS (Home Assistant Community Store) -- configured via `hacs.json`
 - No Docker, Kubernetes, or other infrastructure tooling
+
+#### The release archive (`zip_release`)
+`hacs.json` sets `zip_release: true` and `filename: "austria_public_transport.zip"`, so HACS downloads that one
+release asset instead of fetching every file through the GitHub API. Two constraints bind how `release.yml`
+builds it:
+
+- **The integration's files must sit at the archive root.** HACS runs
+  `zip_file.extractall(<config>/custom_components/austria_public_transport)`, so a top-level
+  `austria_public_transport/` directory inside the zip would install as
+  `custom_components/austria_public_transport/austria_public_transport/`. That is why the workflow `cd`s into
+  the integration directory and zips `.`.
+- **The asset name must equal `filename` exactly.** HACS requests that one name from the release and fails the
+  download if it is absent. Renaming one without the other breaks every install.
+
+The HACS validation action only checks that `filename` is set when `zip_release` is true -- it does **not**
+verify the asset exists on a release, so a broken archive step fails silently at install time, never in CI.
+The archive is therefore attached in the same `gh release create` call, so a release cannot be published
+without it.
+
+The motive is measurement as much as speed: GitHub reports a download count per release asset, which is the
+only install signal this project has.
+
+Releases before 1.0.5 carry no archive. Their tagged `hacs.json` has no `zip_release`, so HACS falls back to
+the file-by-file download for them -- downgrades keep working.
 
 ## Dependencies
 - Runtime: `homeassistant`, `aiohttp`, `voluptuous` (all provided by the HA environment)
