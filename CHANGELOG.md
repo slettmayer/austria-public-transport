@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6
+
+- Bump dependency (Dependabot)
+
 ## 1.0.5
 
 - HACS now installs from a single `austria_public_transport.zip` release asset instead of fetching every file individually through the GitHub API -- faster, and it makes installs countable, since GitHub reports a download count per release asset
