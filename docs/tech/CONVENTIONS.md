@@ -57,6 +57,7 @@ Documents the coding conventions, naming patterns, import ordering, error handli
 - Errors signaled via sentinel dict with `"message"` key (e.g., `{"message": "Timeout"}`)
 - Callers check `if "message" in result`
 - Coordinator raises `UpdateFailed` on error -- never returns stale data; HA owns availability and backoff
+- Setup refreshes each stop with `async_refresh()` (not `async_config_entry_first_refresh()`), so one bad stop ID does not abort the whole entry; `ConfigEntryNotReady`/`PlatformNotReady` is raised only when no stop succeeded
 - Logging levels: `_LOGGER.error()` for `TimeoutError`/`ClientError`, `_LOGGER.warning()` for unexpected exceptions, empty responses, and OeBB API-level errors (HTTP success but `svcResL[0].err != "OK"`)
 - OeBB API-level errors return the API's own error text in the sentinel dict `"message"` value (not hardcoded strings like `"Timeout"`)
 

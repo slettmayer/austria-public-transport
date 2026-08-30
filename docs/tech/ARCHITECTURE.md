@@ -67,6 +67,7 @@ api.py  <--  coordinator.py  <--  sensor.py
 - Wraps `api.py` in a `DataUpdateCoordinator`
 - Polls every 60 seconds (configurable via `const.MIN_TIME_BETWEEN_UPDATES`)
 - On API error: raises `UpdateFailed`, so `last_update_success` flips false and the entities go unavailable
+- During setup that failure is absorbed per stop: `async_setup_entry` (and the YAML `async_setup_platform`) calls `async_refresh()` per coordinator, keeps the healthy stops, and raises `ConfigEntryNotReady` / `PlatformNotReady` only if every stop failed -- an outage, rather than one wrong RBL number
 - One coordinator instance per configured stop ID
 
 **`sensor.py`** -- Owns translation of coordinator data into HA sensor entities.

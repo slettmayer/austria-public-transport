@@ -11,6 +11,7 @@ from homeassistant.components.sensor import PLATFORM_SCHEMA, SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import PlatformNotReady
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -49,10 +50,19 @@ async def async_setup_platform(
     max_departures: int = config[CONF_MAX_DEPARTURES]
 
     sensors = []
+    coordinators = []
     for stop_id in stops:
         coordinator = WienerLinienDataUpdateCoordinator(hass, stop_id)
-        await coordinator.async_config_entry_first_refresh()
+        # Refresh without raising, so a single unreachable stop cannot stop the
+        # healthy ones from being added. Its entity starts out unavailable.
+        await coordinator.async_refresh()
+        coordinators.append(coordinator)
         sensors.append(WienerLinienSensor(coordinator, name, stop_id, max_departures))
+
+    if coordinators and not any(c.last_update_success for c in coordinators):
+        raise PlatformNotReady(
+            f"None of the {len(coordinators)} configured stops could be reached"
+        )
 
     async_add_entities(sensors)
 
