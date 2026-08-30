@@ -65,7 +65,9 @@ async def async_fetch_departures(
                             }
                         )
 
-        departures.sort(key=lambda x: x.get("countdown", 999))
+        departures.sort(
+            key=lambda x: x["countdown"] if x.get("countdown") is not None else 999
+        )
 
         return {
             "departures_count": len(departures),

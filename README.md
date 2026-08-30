@@ -6,6 +6,8 @@ Can be used standalone or together with [vienna-transport-card](https://github.c
 
 ## Installation
 
+**Requires Home Assistant 2026.3.0 or newer** (the version from which the integration's brand icons are served).
+
 ### HACS (recommended)
 
 1. In HACS: **Integrations** → three-dot menu → **Custom repositories**.
@@ -115,6 +117,7 @@ Search for train connections between two OeBB stations. Provide either ID or nam
 | `max_connections`   | No       | Max connections to return (default: 5)   |
 | `time`              | No       | Departure or arrival time in local time (default: now) |
 | `time_mode`         | No       | `departure` or `arrival` (default: `departure`) |
+| `direct_only`       | No       | Only non-stop connections (default: `false`)    |
 
 \* At least one of `from_station_id`/`from_station_name` and one of `to_station_id`/`to_station_name` required.
 

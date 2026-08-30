@@ -1,5 +1,6 @@
 {
   "name": "Austria Public Transport (Wiener Linien & ÖBB)",
+  "homeassistant": "2026.3.0",
   "render_readme": true,
   "country": "AT",
   "zip_release": true,

@@ -66,7 +66,8 @@ api.py  <--  coordinator.py  <--  sensor.py
 **`coordinator.py`** -- Owns polling lifecycle for a single stop.
 - Wraps `api.py` in a `DataUpdateCoordinator`
 - Polls every 60 seconds (configurable via `const.MIN_TIME_BETWEEN_UPDATES`)
-- On API error with existing data: returns stale data (prevents sensor unavailability)
+- On API error: raises `UpdateFailed`, so `last_update_success` flips false and the entities go unavailable
+- During setup that failure is absorbed per stop: `async_setup_entry` (and the YAML `async_setup_platform`) calls `async_refresh()` per coordinator, keeps the healthy stops, and raises `ConfigEntryNotReady` / `PlatformNotReady` only if every stop failed -- an outage, rather than one wrong RBL number
 - One coordinator instance per configured stop ID
 
 **`sensor.py`** -- Owns translation of coordinator data into HA sensor entities.
@@ -128,7 +129,7 @@ Both YAML and config entry setup paths are supported for backwards compatibility
 - API layer has zero HA imports -- enables unit testing without a running HA instance or complex mocking. Rationale: explicit isolation for testability.
 - One coordinator per stop (not one coordinator for all stops) -- enables independent polling and error recovery per stop. Rationale: a single stop's API failure should not affect other stops.
 - Error signaling via sentinel dicts (`{"message": "..."}`) instead of exceptions. Rationale not documented -- needs team input.
-- Stale data fallback on error -- coordinator returns previous good data rather than raising. Rationale: prevents sensor unavailability on transient API errors.
+- No stale-data fallback -- the coordinator raises `UpdateFailed` rather than replaying the previous poll. Rationale: a silently stale departure count is worse than an unavailable entity, since automations cannot tell the difference.
 
 ## Known Risks
 - Sentinel dict error pattern is fragile: callers must remember to check `if "message" in result`. An exception-based approach would be more Pythonic and harder to miss.

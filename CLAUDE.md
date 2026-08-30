@@ -39,7 +39,8 @@ Data flow (OeBB): service call -> `__init__.py` handler -> `oebb_api.async_oebb_
 - Import order: `__future__` -> stdlib -> third-party -> HA -> local relative
 - Classes: `WienerLinien*` prefix with HA suffix (e.g., `WienerLinienDataUpdateCoordinator`)
 - Errors signaled via sentinel dict with `"message"` key, not exceptions
-- Coordinator returns stale data on API error (prevents sensor unavailability)
+- Coordinator raises `UpdateFailed` on API error -- HA owns availability and retry backoff, and entities go unavailable instead of reporting stale departures
+- Two failure paths follow from that: during setup, per-stop refreshes use `async_refresh()` so one unreachable stop cannot block the healthy ones, and only an entry where *every* stop failed raises `ConfigEntryNotReady` (`PlatformNotReady` on the YAML path) for HA to retry. After setup, a failed refresh just makes that stop's entity unavailable
 - See [CONVENTIONS.md](docs/tech/CONVENTIONS.md) for full detail
 
 ## Business Domain

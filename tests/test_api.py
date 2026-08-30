@@ -214,3 +214,55 @@ async def test_fetch_departures_empty_departures() -> None:
     assert result["departures_count"] == 0
     assert result["departures"] == []
     assert result["stop_name"] == "Stephansplatz"
+
+
+PLANNED_EARLY = "2024-01-01T10:03:00.000+0100"
+PLANNED_LATE = "2024-01-01T10:05:00.000+0100"
+
+
+@pytest.mark.asyncio
+async def test_fetch_departures_null_countdown_does_not_crash() -> None:
+    """A departure without a countdown must not wipe out the whole stop."""
+    response = {
+        "data": {
+            "monitors": [
+                {
+                    "locationStop": {"properties": {"title": "Karlsplatz"}},
+                    "lines": [
+                        {
+                            "name": "U1",
+                            "towards": "Oberlaa",
+                            "platform": "1",
+                            "departures": {
+                                "departure": [
+                                    {
+                                        "departureTime": {
+                                            "timePlanned": PLANNED_LATE,
+                                            "countdown": None,
+                                        },
+                                        "vehicle": {"type": "ptMetro"},
+                                    },
+                                    {
+                                        "departureTime": {
+                                            "timePlanned": PLANNED_EARLY,
+                                            "countdown": 3,
+                                        },
+                                        "vehicle": {"type": "ptMetro"},
+                                    },
+                                ]
+                            },
+                        }
+                    ],
+                }
+            ]
+        },
+        "message": {"serverTime": "2024-01-01T10:00:00.000+0100"},
+    }
+    session = _make_session(response)
+
+    result = await async_fetch_departures(session, "247")
+
+    assert "message" not in result
+    assert result["departures_count"] == 2
+    # Known countdown sorts ahead of the unknown one
+    assert [d["countdown"] for d in result["departures"]] == [3, None]
