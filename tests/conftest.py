@@ -5,6 +5,15 @@ from __future__ import annotations
 import sys
 from unittest.mock import MagicMock
 
+
+class ConfigEntryNotReady(Exception):
+    """Stand-in for homeassistant.exceptions.ConfigEntryNotReady."""
+
+
+class PlatformNotReady(Exception):
+    """Stand-in for homeassistant.exceptions.PlatformNotReady."""
+
+
 # Mock the homeassistant package so that importing the custom_components
 # package doesn't fail in a test environment without HA installed.
 # Only the api.py and const.py modules are actually exercised by these tests.
@@ -12,6 +21,10 @@ ha_mock = MagicMock()
 sys.modules.setdefault("homeassistant", ha_mock)
 sys.modules.setdefault("homeassistant.config_entries", ha_mock)
 sys.modules.setdefault("homeassistant.core", ha_mock)
+# Both are *raised* by the setup paths, so they have to be real exception types:
+# a bare MagicMock attribute raises TypeError instead of the exception itself.
+ha_mock.ConfigEntryNotReady = ConfigEntryNotReady
+ha_mock.PlatformNotReady = PlatformNotReady
 sys.modules.setdefault("homeassistant.exceptions", ha_mock)
 sys.modules.setdefault("homeassistant.const", ha_mock)
 sys.modules.setdefault("homeassistant.components", ha_mock)
