@@ -22,6 +22,7 @@ from .const import (
     DEFAULT_MAX_DEPARTURES,
     DOMAIN,
     FETCH_DEPARTURES_SERVICE_NAME,
+    OEBB_ALL_PRODUCTS,
     OEBB_SEARCH_STATION_SERVICE_NAME,
     OEBB_SERVICE_ALERTS_SERVICE_NAME,
     OEBB_STATION_BOARD_SERVICE_NAME,
@@ -102,8 +103,8 @@ OEBB_TRIP_SEARCH_SCHEMA = vol.All(
 OEBB_SERVICE_ALERTS_SCHEMA = vol.Schema(
     {
         vol.Optional("max_alerts", default=20): vol.All(int, vol.Range(min=1, max=100)),
-        vol.Optional("product_filter", default=1023): vol.All(
-            int, vol.Range(min=1, max=1023)
+        vol.Optional("product_filter", default=OEBB_ALL_PRODUCTS): vol.All(
+            int, vol.Range(min=1, max=OEBB_ALL_PRODUCTS)
         ),
     }
 )
@@ -188,7 +189,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         return await async_oebb_service_alerts(
             session,
             max_alerts=call.data.get("max_alerts", 20),
-            product_filter=call.data.get("product_filter", 1023),
+            product_filter=call.data.get("product_filter", OEBB_ALL_PRODUCTS),
         )
 
     hass.services.async_register(

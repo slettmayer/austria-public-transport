@@ -121,9 +121,9 @@ oebb_service_alerts:
           mode: box
     product_filter:
       required: false
-      default: 1023
+      default: 65535
       selector:
         number:
           min: 1
-          max: 1023
+          max: 65535
           mode: box

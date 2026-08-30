@@ -56,7 +56,7 @@ Documents the coding conventions, naming patterns, import ordering, error handli
 - No custom exceptions in the codebase
 - Errors signaled via sentinel dict with `"message"` key (e.g., `{"message": "Timeout"}`)
 - Callers check `if "message" in result`
-- Coordinator returns stale data on error (prevents sensor unavailability)
+- Coordinator raises `UpdateFailed` on error -- never returns stale data; HA owns availability and backoff
 - Logging levels: `_LOGGER.error()` for `TimeoutError`/`ClientError`, `_LOGGER.warning()` for unexpected exceptions, empty responses, and OeBB API-level errors (HTTP success but `svcResL[0].err != "OK"`)
 - OeBB API-level errors return the API's own error text in the sentinel dict `"message"` value (not hardcoded strings like `"Timeout"`)
 
