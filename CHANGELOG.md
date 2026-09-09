@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Bump dependency (Dependabot)
+
 ## 1.1.0
 
 - `oebb_service_alerts` now accepts the full product bitmask up to 65535 and defaults to it, so private operators (bit 12 / 4096 -- Westbahn, RegioJet) can finally be requested. The 0.9.2 fix had only landed in `const.py`; the service schema, selector and translations still capped at 1023, so the documented call was rejected
