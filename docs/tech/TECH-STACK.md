@@ -37,11 +37,10 @@ Documents the languages, frameworks, build tools, testing infrastructure, and ex
 - `pytest` + `pytest-asyncio` -- test runner with `asyncio_mode = "auto"`
 
 ### CI/CD
-- GitHub Actions with three workflows:
+- GitHub Actions with two workflows:
   - `validate.yml` -- runs on push to `main` and PRs: Ruff lint+format, Hassfest, HACS validation, pytest. A `gate` job aggregates results.
   - `release.yml` -- triggered after validate succeeds on `main`: reads version from `manifest.json`, extracts `CHANGELOG.md` section, builds `austria_public_transport.zip`, creates the GitHub Release with that archive attached.
-  - `dependabot-version-bump.yml` -- auto-bumps patch version in `manifest.json` and prepends `CHANGELOG.md` entry for Dependabot PRs.
-- Dependabot configured for weekly GitHub Actions dependency updates.
+- Dependabot configured for weekly GitHub Actions and `pip` (the ruff pin in `requirements_lint.txt`) updates. A Dependabot merge gets no version bump and produces no release: nothing it updates is in the release archive, and `manifest.json` declares no requirements. The update ships with the next real release.
 
 ### External APIs
 - Wiener Linien OGD Realtime API (`https://www.wienerlinien.at/ogd_realtime/monitor`) -- read-only, public, no auth required.
