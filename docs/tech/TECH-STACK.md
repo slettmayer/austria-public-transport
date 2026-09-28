@@ -40,8 +40,8 @@ Documents the languages, frameworks, build tools, testing infrastructure, and ex
 - GitHub Actions with three workflows:
   - `validate.yml` -- runs on push to `main` and PRs: Ruff lint+format, Hassfest, HACS validation, pytest. A `gate` job aggregates results.
   - `release.yml` -- triggered after validate succeeds on `main`: reads version from `manifest.json`, extracts `CHANGELOG.md` section, builds `austria_public_transport.zip`, creates the GitHub Release with that archive attached.
-  - `dependabot-version-bump.yml` -- auto-bumps patch version in `manifest.json` and prepends `CHANGELOG.md` entry for Dependabot PRs.
-- Dependabot configured for weekly GitHub Actions dependency updates.
+  - `dependabot-auto-merge.yml` -- enables squash auto-merge on Dependabot PRs, so they land once `gate` passes. Uses the GitHub App token (`GH_ACTION_APP_CLIENT_ID` / `GH_ACTION_APP_PRIVATE_KEY`, in both the Actions and Dependabot secret stores) because a `GITHUB_TOKEN` merge triggers no workflows.
+- Dependabot configured for weekly GitHub Actions (Thursdays) and `pip` (Mondays) (the ruff pin in `requirements_lint.txt`) updates. A Dependabot merge gets no version bump and produces no release: nothing it updates is in the release archive, and `manifest.json` declares no requirements. The update ships with the next real release.
 
 ### External APIs
 - Wiener Linien OGD Realtime API (`https://www.wienerlinien.at/ogd_realtime/monitor`) -- read-only, public, no auth required.
