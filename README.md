@@ -10,11 +10,12 @@ Can be used standalone or together with [vienna-transport-card](https://github.c
 
 ### HACS (recommended)
 
-1. In HACS: **Integrations** → three-dot menu → **Custom repositories**.
-2. Add `https://github.com/slettmayer/austria-public-transport` with category **Integration**.
-3. Search for **"Austria Public Transport"** in HACS, install it, and restart Home Assistant.
+The integration is in the [HACS](https://hacs.xyz/) default store.
 
-Once the integration is accepted into the HACS default store, you can skip the custom-repository step and search for it directly.
+[![Open your Home Assistant instance and open this repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=slettmayer&repository=austria-public-transport&category=integration)
+
+1. In HACS, search for **"Austria Public Transport"** and download it (or use the button above).
+2. Restart Home Assistant.
 
 ### Manual
 
