@@ -41,7 +41,9 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.12"
+          # Current Home Assistant needs 3.14; on an older Python pip falls
+          # back to a years-old release whose pinned PyYAML no longer builds.
+          python-version: "3.14"
       - run: pip install pytest pytest-asyncio aiohttp voluptuous homeassistant
       - run: pytest tests/ -v -m "not integration"
 
