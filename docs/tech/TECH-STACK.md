@@ -49,7 +49,7 @@ Documents the languages, frameworks, build tools, testing infrastructure, and ex
 - OeBB Scotty API (`https://fahrplan.oebb.at/bin/mgate.exe`) -- JSON POST API with embedded authentication (AID token). Used for station search, station boards, and trip planning. Not officially documented (reverse-engineered from webapp).
 
 ### Distribution
-- HACS (Home Assistant Community Store) -- configured via `hacs.json`
+- HACS (Home Assistant Community Store) default store -- configured via `hacs.json`; listed since 2026-10-18 ([hacs/default#9256](https://github.com/hacs/default/pull/9256))
 - No Docker, Kubernetes, or other infrastructure tooling
 
 #### The release archive (`zip_release`)
