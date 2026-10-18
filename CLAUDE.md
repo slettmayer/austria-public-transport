@@ -48,7 +48,7 @@ Vienna public transport departure monitoring and Austrian train connections. Eac
 
 ## Structural Risks
 - Test coverage exists for `api.py` and `oebb_api.py` -- coordinator, sensor, config flow are untested
-- The `Tests` CI job installs `pytest pytest-asyncio aiohttp voluptuous homeassistant` inline and **unpinned**, so a Home Assistant release can change the verdict with no commit of ours. Only `ruff` is pinned (`requirements_lint.txt`)
+- The `Tests` CI job installs `pytest pytest-asyncio aiohttp voluptuous homeassistant` inline and **unpinned**, so a Home Assistant release can change the verdict with no commit of ours. Only `ruff` is pinned (`requirements_lint.txt`). The job's Python must keep up with what current Home Assistant requires (3.14 as of 2026-10): on an older one pip silently resolves a years-old Home Assistant, which is how 3.12 broke the job
 - `pyproject.toml` is tool configuration only; its `version` is inert and intentionally not synced with `manifest.json`, which is the one CI and `release.yml` read
 - Sentinel dict error pattern is fragile -- callers must check `if "message" in result`
 - YAML and config entry setup paths duplicate coordinator creation logic
