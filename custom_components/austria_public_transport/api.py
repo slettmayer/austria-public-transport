@@ -8,9 +8,16 @@ from typing import Any
 
 import aiohttp
 
-from .const import API_ENDPOINT, API_TIMEOUT
+from .const import API_ENDPOINT, API_TIMEOUT, TRAFFIC_INFO_ENDPOINT
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _clean_text(text: str | None) -> str | None:
+    """Change line breaks and repeated whitespace into single spaces"""
+    if not text:
+        return text
+    return " ".join(text.split())
 
 
 async def async_fetch_departures(
@@ -85,4 +92,70 @@ async def async_fetch_departures(
         return {"message": "No data"}
     except Exception as err:
         _LOGGER.warning("Unexpected error for stop %s: %s", stop_id, err)
+        return {"message": "No data"}
+
+
+async def async_fetch_traffic_info(
+    session: aiohttp.ClientSession,
+    category: str | None = None,
+    line: str | None = None,
+    stop_id: int | None = None,
+    max_alerts: int = 20,
+) -> dict[str, Any]:
+    """Getting and normalizing Wiener Linien Traffic info(disruptions, elevators).
+    Returns a dict with alerts_count and an alerts list. Returns a dict with
+    """
+    try:
+        async with asyncio.timeout(API_TIMEOUT):
+            response = await session.get(TRAFFIC_INFO_ENDPOINT)
+            data = await response.json()
+
+        payload = data.get("data") or {}
+        categories = {
+            cat.get("id"): cat.get("name")
+            for cat in payload.get("trafficInfoCategories") or []
+        }
+        alerts: list[dict[str, Any]] = []
+
+        for item in payload.get("trafficInfos") or []:
+            attributes = item.get("attributes") or {}
+            time_info = item.get("time") or {}
+            item_category = categories.get(item.get("refTrafficInfoCategoryId"))
+            lines = item.get("relatedLines") or []
+            stops = list(dict.fromkeys(item.get("relatedStops") or []))
+
+            if category and item_category != category:
+                continue
+            if line and line.upper() not in [name.upper() for name in lines]:
+                continue
+            if stop_id is not None and stop_id not in stops:
+                continue
+
+            alerts.append(
+                {
+                    "id": item.get("name"),
+                    "category": item_category,
+                    "title": _clean_text(item.get("title")),
+                    "description": _clean_text(item.get("description")),
+                    "status": item.get("status") or attributes.get("status"),
+                    "location": _clean_text(
+                        item.get("location") or attributes.get("location")
+                    ),
+                    "reason": attributes.get("reason"),
+                    "priority": item.get("priority"),
+                    "lines": lines,
+                    "stops": stops,
+                    "start": time_info.get("start"),
+                    "end": time_info.get("end"),
+                }
+            )
+
+        alerts = alerts[:max_alerts]
+        return {"alerts_count": len(alerts), "alerts": alerts}
+
+    except TimeoutError:
+        _LOGGER.error("Timeout fetching Wiener Linien traffic info")
+        return {"message": "Timeout"}
+    except aiohttp.ClientError as err:
+        _LOGGER.error("Error fetching Wiener Linien traffic info: %s", err)
         return {"message": "No data"}
