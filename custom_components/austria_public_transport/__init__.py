@@ -16,7 +16,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.typing import ConfigType
 
-from .api import async_fetch_departures
+from .api import async_fetch_departures, async_fetch_traffic_info
 from .const import (
     CONF_MAX_DEPARTURES,
     CONF_STOPS,
@@ -28,6 +28,8 @@ from .const import (
     OEBB_SERVICE_ALERTS_SERVICE_NAME,
     OEBB_STATION_BOARD_SERVICE_NAME,
     OEBB_TRIP_SEARCH_SERVICE_NAME,
+    TRAFFIC_INFO_CATEGORIES,
+    WIENERLINIEN_TRAFFIC_INFO_SERVICE_NAME,
 )
 from .coordinator import WienerLinienDataUpdateCoordinator
 from .oebb_api import (
@@ -44,6 +46,15 @@ PLATFORMS = ["sensor"]
 FETCH_DEPARTURES_SCHEMA = vol.Schema(
     {
         vol.Required("stop_id"): vol.Coerce(str),
+    }
+)
+
+WIENERLINIEN_TRAFFIC_INFO_SCHEMA = vol.Schema(
+    {
+        vol.Optional("category"): vol.In(TRAFFIC_INFO_CATEGORIES),
+        vol.Optional("line"): str,
+        vol.Optional("stop_id"): vol.Coerce(int),
+        vol.Optional("max_alerts", default=20): vol.All(int, vol.Range(min=1, max=100)),
     }
 )
 
@@ -126,6 +137,24 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
         FETCH_DEPARTURES_SERVICE_NAME,
         fetch_departures,
         schema=FETCH_DEPARTURES_SCHEMA,
+        supports_response=SupportsResponse.ONLY,
+    )
+
+    async def wienerlinien_traffic_info(call: ServiceCall) -> ServiceResponse:
+        """Fetch Wiener Linien traffic info (disruptions, elevator outages)."""
+        return await async_fetch_traffic_info(
+            session,
+            category=call.data.get("category"),
+            line=call.data.get("line"),
+            stop_id=call.data.get("stop_id"),
+            max_alerts=call.data.get("max_alerts", 20),
+        )
+
+    hass.services.async_register(
+        DOMAIN,
+        WIENERLINIEN_TRAFFIC_INFO_SERVICE_NAME,
+        wienerlinien_traffic_info,
+        schema=WIENERLINIEN_TRAFFIC_INFO_SCHEMA,
         supports_response=SupportsResponse.ONLY,
     )
 

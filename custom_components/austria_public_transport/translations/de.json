@@ -41,6 +41,28 @@
         }
       }
     },
+        "wienerlinien_traffic_info": {
+      "name": "Wiener Linien: Störungsinfo",
+      "description": "Aktuelle Störungen und Aufzugsausfälle der Wiener Linien abrufen.",
+      "fields": {
+        "category": {
+          "name": "Kategorie",
+          "description": "Nur eine Kategorie zurückgeben: aufzugsinfo (Aufzugsstörungen), stoerunglang (Störung lang) oder stoerungkurz (Störung kurz). Leer lassen für alle."
+        },
+        "line": {
+          "name": "Linie",
+          "description": "Nur Meldungen zu dieser Linie zurückgeben, z. B. U3 oder 46."
+        },
+        "stop_id": {
+          "name": "Haltestellen-ID",
+          "description": "Nur Meldungen zu dieser numerischen Haltestellen-ID zurückgeben. Langfristige Störungen enthalten oft keine Haltestellen und werden dann ausgelassen."
+        },
+        "max_alerts": {
+          "name": "Max. Meldungen",
+          "description": "Maximale Anzahl der zurückgegebenen Meldungen."
+        }
+      }
+    },
     "oebb_search_station": {
       "name": "ÖBB: Station suchen",
       "description": "ÖBB-Stationen nach Name suchen, um Stations-IDs zu finden.",

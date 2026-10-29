@@ -56,6 +56,29 @@ response_variable: departures
 The response includes `departures_count`, `stop_id`, `stop_name`, `departures` (list), and `server_time`.
 
 ---
+### `austria_public_transport.wienerlinien_traffic_info`
+
+Fetches current Wiener Linien disruptions and elevator outages on demand.
+
+| Field        | Required | Description                                                                                                    |
+|--------------|----------|----------------------------------------------------------------------------------------------------------------|
+| `category`   | No       | `aufzugsinfo` (elevator outages), `stoerunglang` (long-term disruptions) or `stoerungkurz` (short-term disruptions). Default: all |
+| `line`       | No       | Only alerts affecting this line, e.g. `U3` (case-insensitive)                                                  |
+| `stop_id`    | No       | Only alerts affecting this stop ID. Long-term disruptions often list no stops and are then left out           |
+| `max_alerts` | No       | Max alerts to return (default: 20)                                                                             |
+
+Example:
+```yaml
+service: austria_public_transport.wienerlinien_traffic_info
+data:
+  category: aufzugsinfo
+  line: U6
+response_variable: traffic
+```
+
+The response includes `alerts_count` and `alerts` (list with `id`, `category`, `title`, `description`, `status`, `location`, `reason`, `priority`, `lines`, `stops`, `start`, `end`).
+
+---
 
 ### `austria_public_transport.oebb_search_station`
 

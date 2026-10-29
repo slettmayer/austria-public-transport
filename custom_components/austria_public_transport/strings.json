@@ -41,6 +41,28 @@
         }
       }
     },
+        "wienerlinien_traffic_info": {
+      "name": "Wiener Linien: Traffic Info",
+      "description": "Fetch current Wiener Linien disruptions and elevator outages.",
+      "fields": {
+        "category": {
+          "name": "Category",
+          "description": "Only return one category: aufzugsinfo (elevator outages), stoerunglang (long-term disruptions) or stoerungkurz (short-term disruptions). Leave empty for all."
+        },
+        "line": {
+          "name": "Line",
+          "description": "Only return alerts affecting this line, e.g. U3 or 46."
+        },
+        "stop_id": {
+          "name": "Stop ID",
+          "description": "Only return alerts affecting this numeric stop ID. Long-term disruptions often list no stops and are then left out."
+        },
+        "max_alerts": {
+          "name": "Max Alerts",
+          "description": "Maximum number of alerts to return."
+        }
+      }
+    },
     "oebb_search_station": {
       "name": "OeBB: Search Station",
       "description": "Search OeBB stations by name to find station IDs.",

@@ -17,6 +17,10 @@ MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=60)
 
 FETCH_DEPARTURES_SERVICE_NAME = "fetch_departures"
 
+WIENERLINIEN_TRAFFIC_INFO_SERVICE_NAME = "wienerlinien_traffic_info"
+# Category names used by Wiener Linien trafficINfoList API
+TRAFFIC_INFO_CATEGORIES = ["aufzugsinfo", "stoerunglang", "stoerungkurz"]
+
 # OeBB API
 OEBB_API_ENDPOINT = "https://fahrplan.oebb.at/bin/mgate.exe"
 OEBB_API_TIMEOUT = 15

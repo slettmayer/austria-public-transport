@@ -8,6 +8,39 @@ fetch_departures:
         text:
           multiple: false
 
+wienerlinien_traffic_info:
+  fields:
+    category:
+      required: false
+      selector:
+        select:
+          options:
+            - "aufzugsinfo"
+            - "stoerunglang"
+            - "stoerungkurz"
+    line:
+      required: false
+      example: "U3"
+      selector:
+        text:
+          multiple: false
+    stop_id:
+      required: false
+      example: "4425"
+      selector:
+        number:
+          min: 1
+          max: 99999
+          mode: box
+    max_alerts:
+      required: false
+      default: 20
+      selector:
+        number:
+          min: 1
+          max: 100
+          mode: box
+
 oebb_search_station:
   fields:
     query:
