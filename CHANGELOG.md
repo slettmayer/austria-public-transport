@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- New `wienerlinien_traffic_info` service: fetch current Wiener Linien disruptions and elevator outages, optionally filtered by category, line or stop. Fields that Wiener Linien places differently per category (status, location) are normalized into one format
+
 ## 1.1.2
 
 - Bump dependency (Dependabot)

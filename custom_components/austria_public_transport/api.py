@@ -8,9 +8,29 @@ from typing import Any
 
 import aiohttp
 
-from .const import API_ENDPOINT, API_TIMEOUT
+from .const import (
+    API_ENDPOINT,
+    API_TIMEOUT,
+    TRAFFIC_INFO_CATEGORY_ORDER,
+    TRAFFIC_INFO_ENDPOINT,
+    TRAFFIC_INFO_OK_CODE,
+)
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _clean_text(text: str | None) -> str | None:
+    """Change line breaks and repeated whitespace into single spaces"""
+    if not text:
+        return text
+    return " ".join(text.split())
+
+
+def _clean_reason(reason: str | None) -> str | None:
+    """Drop the literal "undefined" the API sends when no reason is set."""
+    if not reason or reason == "undefined":
+        return None
+    return reason
 
 
 async def async_fetch_departures(
@@ -85,4 +105,96 @@ async def async_fetch_departures(
         return {"message": "No data"}
     except Exception as err:
         _LOGGER.warning("Unexpected error for stop %s: %s", stop_id, err)
+        return {"message": "No data"}
+
+
+async def async_fetch_traffic_info(
+    session: aiohttp.ClientSession,
+    category: str | None = None,
+    line: str | None = None,
+    stop_id: int | None = None,
+    max_alerts: int = 20,
+) -> dict[str, Any]:
+    """Fetch and normalize Wiener Linien traffic info (disruptions, elevators).
+
+    Disruptions are listed before elevator outages, then cut to max_alerts.
+    Returns a dict with alerts_count, total_count (matches before the cut)
+    and an alerts list. Returns a dict with just 'message' on error.
+    """
+    try:
+        async with asyncio.timeout(API_TIMEOUT):
+            response = await session.get(TRAFFIC_INFO_ENDPOINT)
+            data = await response.json()
+
+        message = data.get("message") or {}
+        if message.get("messageCode") != TRAFFIC_INFO_OK_CODE:
+            _LOGGER.warning(
+                "Wiener Linien traffic info API error %s: %s",
+                message.get("messageCode"),
+                message.get("value"),
+            )
+            return {"message": message.get("value") or "No data"}
+        payload = data.get("data") or {}
+        categories = {
+            cat.get("id"): cat.get("name")
+            for cat in payload.get("trafficInfoCategories") or []
+        }
+        alerts: list[dict[str, Any]] = []
+
+        for item in payload.get("trafficInfos") or []:
+            attributes = item.get("attributes") or {}
+            time_info = item.get("time") or {}
+            item_category = categories.get(item.get("refTrafficInfoCategoryId"))
+            lines = item.get("relatedLines") or []
+            stops = list(dict.fromkeys(item.get("relatedStops") or []))
+
+            if category and item_category != category:
+                continue
+            if line and line.upper() not in [name.upper() for name in lines]:
+                continue
+            if stop_id is not None and stop_id not in stops:
+                continue
+
+            alerts.append(
+                {
+                    "id": item.get("name"),
+                    "category": item_category,
+                    "title": _clean_text(item.get("title")),
+                    "description": _clean_text(item.get("description")),
+                    "status": item.get("status") or attributes.get("status"),
+                    "location": _clean_text(
+                        item.get("location") or attributes.get("location")
+                    ),
+                    "reason": _clean_reason(
+                        attributes.get("reason") or item.get("reasonName")
+                    ),
+                    "priority": item.get("priority"),
+                    "lines": lines,
+                    "stops": stops,
+                    "start": time_info.get("start"),
+                    "end": time_info.get("end"),
+                }
+            )
+
+        alerts.sort(
+            key=lambda alert: TRAFFIC_INFO_CATEGORY_ORDER.get(
+                alert["category"], len(TRAFFIC_INFO_CATEGORY_ORDER)
+            )
+        )
+        total_count = len(alerts)
+        alerts = alerts[:max_alerts]
+        return {
+            "alerts_count": len(alerts),
+            "total_count": total_count,
+            "alerts": alerts,
+        }
+
+    except TimeoutError:
+        _LOGGER.error("Timeout fetching Wiener Linien traffic info")
+        return {"message": "Timeout"}
+    except aiohttp.ClientError as err:
+        _LOGGER.error("Error fetching Wiener Linien traffic info: %s", err)
+        return {"message": "No data"}
+    except Exception as err:
+        _LOGGER.warning("Unexpected error fetching Wiener Linien traffic info: %s", err)
         return {"message": "No data"}
